@@ -3,28 +3,28 @@ import Friend from "components/Friend";
 import WidgetWrapper from "components/WidgetWrapper";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { setFriends } from "state";
+import { setLocations } from "state";
 
 const LocationListWidget = ({ userId }) => {
   const dispatch = useDispatch();
   const { palette } = useTheme();
   const token = useSelector((state) => state.token);
-  const friends = useSelector((state) => state.user.friends);
+  const locations = useSelector((state) => state.user.locations);
 
-  const getFriends = async () => {
+  const getLocations = async () => {
     const response = await fetch(
-      `http://localhost:6001/users/${userId}/friends`,
+      `http://localhost:6001/location/all`,
       {
         method: "GET",
         headers: { Authorization: `Bearer ${token}` },
       }
     );
     const data = await response.json();
-    dispatch(setFriends({ friends: data }));
+    dispatch(setLocations({ locations: data }));
   };
 
   useEffect(() => {
-    getFriends();
+    getLocations();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
@@ -38,14 +38,8 @@ const LocationListWidget = ({ userId }) => {
         Bars, Pubs and Clubs in City 
       </Typography>
       <Box display="flex" flexDirection="column" gap="1.5rem">
-        {friends.map((friend) => (
-          <Friend
-            key={friend._id}
-            friendId={friend._id}
-            name={`${friend.firstName} ${friend.lastName}`}
-            subtitle={friend.occupation}
-            userPicturePath={friend.picturePath}
-          />
+        {locations.map((location) => (
+          <div>{location.title}</div>
         ))}
       </Box>
     </WidgetWrapper>
