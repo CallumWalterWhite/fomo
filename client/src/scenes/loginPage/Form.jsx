@@ -22,7 +22,6 @@ const registerSchema = yup.object().shape({
   email: yup.string().email("invalid email").required("required"),
   password: yup.string().required("required"),
   location: yup.string().required("required"),
-  occupation: yup.string().required("required"),
   picture: yup.string().required("required"),
 });
 
@@ -61,7 +60,7 @@ const Form = () => {
       formData.append(value, values[value]);
     }
     formData.append("picturePath", values.picture.name);
-
+    console.log(formData);
     const savedUserResponse = await fetch(
       "http://localhost:6001/auth/register",
       {

@@ -17,6 +17,7 @@ import { createPost } from "./controllers/posts.js";
 import { verifyToken } from "./middleware/auth.js";
 import User from "./models/User.js";
 import Post from "./models/Post.js";
+import NightPlan from "./models/NightPlan.js"
 import { users, posts } from "./data/index.js";
 
 /* CONFIGURATIONS */
