@@ -1,5 +1,5 @@
+import React from "react";
 import { Box, Typography, useTheme } from "@mui/material";
-import Friend from "components/Friend";
 import WidgetWrapper from "components/WidgetWrapper";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -9,18 +9,25 @@ const LocationListWidget = ({ userId }) => {
   const dispatch = useDispatch();
   const { palette } = useTheme();
   const token = useSelector((state) => state.token);
-  const locations = useSelector((state) => state.user.locations);
+  const locations = useSelector((state) => state.user.locations || []);
 
   const getLocations = async () => {
-    const response = await fetch(
-      `http://localhost:6001/location/all`,
-      {
+    try {
+      const response = await fetch(`http://localhost:6001/location/all`, {
         method: "GET",
         headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
       }
-    );
-    const data = await response.json();
-    dispatch(setLocations({ locations: data }));
+
+      const data = await response.json();
+      dispatch(setLocations({ locations: data }));
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      // Handle the error, show a message to the user, or retry the request
+    }
   };
 
   useEffect(() => {
@@ -37,9 +44,16 @@ const LocationListWidget = ({ userId }) => {
       >
         Bars, Pubs and Clubs in City 
       </Typography>
-      <Box display="flex" flexDirection="column" gap="1.5rem">
+      <Box
+          className="scroll-container"
+          maxHeight="300px"
+          overflowY="auto"
+          display="flex" 
+          flexDirection="column" 
+          gap="0.5rem"
+      >
         {locations.map((location) => (
-          <div>{location.title}</div>
+          <span key={location.id}>{location.title}</span>
         ))}
       </Box>
     </WidgetWrapper>
