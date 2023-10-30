@@ -9,7 +9,7 @@ const LocationListWidget = ({ userId }) => {
   const dispatch = useDispatch();
   const { palette } = useTheme();
   const token = useSelector((state) => state.token);
-  const locations = useSelector((state) => state.user.locations || []);
+  const locations = useSelector((state) => state.locations || []);
 
   const getLocations = async () => {
     try {

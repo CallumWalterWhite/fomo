@@ -1,4 +1,4 @@
-import { Box, useMediaQuery } from "@mui/material";
+import { Box, Tab, Tabs, useMediaQuery } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
@@ -10,10 +10,14 @@ import UserWidget from "scenes/widgets/UserWidget";
 
 const ProfilePage = () => {
   const [user, setUser] = useState(null);
+  const [selectedTab, setSelectedTab] = useState(0);
   const { userId } = useParams();
   const token = useSelector((state) => state.token);
   const isNonMobileScreens = useMediaQuery("(min-width:1000px)");
 
+  const handleChangeTab = (event, newValue) => {
+    setSelectedTab(newValue);
+  };
   const getUser = async () => {
     const response = await fetch(`http://localhost:6001/users/${userId}`, {
       method: "GET",
@@ -33,24 +37,38 @@ const ProfilePage = () => {
     <Box>
       <Navbar />
       <Box
-        width="100%"
+        width="75%"
         padding="2rem 6%"
-        display={isNonMobileScreens ? "flex" : "block"}
-        gap="2rem"
+        display="flex"
+        flexDirection="column"
+        alignItems="center"
         justifyContent="center"
+        margin="auto"
+        gap="2rem"
       >
-        <Box flexBasis={isNonMobileScreens ? "26%" : undefined}>
+        <Box width="100%" mt="2rem">
           <UserWidget userId={userId} picturePath={user.picturePath} />
-          <Box m="2rem 0" />
-          <FriendListWidget userId={userId} />
-        </Box>
-        <Box
-          flexBasis={isNonMobileScreens ? "42%" : undefined}
-          mt={isNonMobileScreens ? undefined : "2rem"}
-        >
-          {/* <MyPostWidget picturePath={user.picturePath} /> */}
-          {/* <Box m="2rem 0" /> */}
-          <PostsWidget userId={userId} isProfile />
+          <Tabs
+            value={selectedTab}
+            onChange={handleChangeTab}
+            centered
+            textColor="primary"
+            indicatorColor="primary"
+          >
+            <Tab label="Posts" />
+            <Tab label="Media" />
+            <Tab label="About" />
+            {/* Add more tabs if needed */}
+          </Tabs>
+          {selectedTab === 0 && (
+            <PostsWidget userId={userId} isProfile />
+          )}
+          {selectedTab === 1 && (
+            <PostsWidget userId={userId} isProfile />
+          )}
+          {selectedTab === 2 && (
+            <PostsWidget userId={userId} isProfile />
+          )}
         </Box>
       </Box>
     </Box>
