@@ -1,4 +1,5 @@
 import Location from "../models/Location.js";
+import City from "../models/City.js";
 
 export const getAllLocations = async (req, res) => {
   try {
@@ -19,9 +20,10 @@ export const getLocation = async (req, res) => {
   }
 };
 
-export const getCities = (req, res) => {
+export const getCities = async (req, res) => {
   try {
-    const cities = ['Derby', 'Nottingham'];
+    const cities = await City.find();
+    console.log(cities);
     res.status(200).json(cities);
   } catch (err) {
     res.status(404).json({ message: err.message });

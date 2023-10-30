@@ -2,7 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   mode: "light",
-  currentLocation: null,
+  currentLocation: "",
   posts: [],
   locations : [],
 };
@@ -22,7 +22,7 @@ export const authSlice = createSlice({
       }
     },
     setUserLocation: (state, action) => {
-      state.currentLocation.location = action.location;
+      state.currentLocation = action.payload.location;
     },
     setLocations: (state, action) => {
       if (state.user) {

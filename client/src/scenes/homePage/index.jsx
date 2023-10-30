@@ -1,29 +1,56 @@
 import React, { useState, useEffect } from "react";
-import { Box, useMediaQuery, Modal, Select, MenuItem, Button } from "@mui/material";
+import {
+  LocationOnOutlined,
+} from "@mui/icons-material";
+import { Box, useMediaQuery, Typography, useTheme, Modal, Select, MenuItem, Button } from "@mui/material";
 import { useSelector, useDispatch } from "react-redux";
 import Navbar from "scenes/navbar";
-import UserWidget from "scenes/widgets/UserWidget";
-import MyPostWidget from "scenes/widgets/MyPostWidget";
 import PostsWidget from "scenes/widgets/PostsWidget";
 import AdvertWidget from "scenes/widgets/AdvertWidget";
-import FriendListWidget from "scenes/widgets/FriendListWidget";
-import LocationListWidget from "scenes/widgets/LocationListWidget";
+import WidgetWrapper from "components/WidgetWrapper";
 import { setUserLocation } from "state";
 
 const HomePage = () => {
   const dispatch = useDispatch();
-  const userLocation = useSelector((state) => state.currentLocation); // Assuming userLocation is stored in Redux state
+  const userLocation = useSelector((state) => state.currentLocation) || "";
   const isNonMobileScreens = useMediaQuery("(min-width:1000px)");
+  const [selectedLocation, setSelectedLocation] = useState(userLocation);
   const [isModalOpen, setIsModalOpen] = useState(!userLocation);
+  const [isModalReopened, setIsModalReopened] = useState(false);
+  const [cities, setCities] = useState([]); 
+  const { palette } = useTheme();
+  const dark = palette.neutral.dark;
+  const medium = palette.neutral.medium;
+  const main = palette.neutral.main;
 
   const handleLocationChange = (event) => {
-    dispatch(setUserLocation({ location: event.target.value }));
+    setSelectedLocation(event.target.value);
+  };
+  
+  const fetchData = async () => {
+    try {
+      const response = await fetch("http://localhost:6001/cities");
+      const data = await response.json();
+      setCities(data);
+    } catch (error) {
+      console.error("Error fetching cities:", error);
+    }
+  };
+
+  const handleConfirm = () => {
+    dispatch(setUserLocation({ location: selectedLocation }));
     setIsModalOpen(false);
+    setIsModalReopened(false);
+  };
+
+  const handleLocationClick = () => {
+    setIsModalReopened(true);
   };
 
   useEffect(() => {
-    setIsModalOpen(!userLocation);
-  }, [userLocation]);
+    setIsModalOpen(!userLocation || isModalReopened);
+    fetchData();
+  }, [userLocation, isModalReopened]);
 
   return (
     <Box>
@@ -41,11 +68,14 @@ const HomePage = () => {
             textAlign: "center",
           }}
         >
-          <Select label="Select Location" value={userLocation} onChange={handleLocationChange}>
-            <MenuItem value="Derby">Derby</MenuItem>
-            {/* Add more location options as needed */}
+          <Select label="Select Location" value={selectedLocation} onChange={handleLocationChange}>
+            {cities.map((city) => (
+              <MenuItem key={city.CityId} value={city}>
+                {city.Name}
+              </MenuItem>
+            ))}
           </Select>
-          <Button variant="contained" onClick={() => setIsModalOpen(false)}>
+          <Button variant="contained" onClick={handleConfirm}>
             Confirm
           </Button>
         </Box>
@@ -58,9 +88,18 @@ const HomePage = () => {
         justifyContent="space-between"
       >
         <Box flexBasis={isNonMobileScreens ? "26%" : undefined}>
-          <UserWidget />
+          <WidgetWrapper>
+            <Box p="1rem 0">
+              <Box display="flex" alignItems="center" gap="1rem" mb="0.5rem" onClick={handleLocationClick}>
+                <LocationOnOutlined fontSize="large" sx={{ color: main }} />
+                <Typography color={medium} style={{ cursor: "pointer" }}>
+                  {userLocation?.Name}
+                </Typography>
+              </Box>
+            </Box>
+          </WidgetWrapper>
           <Box m="2rem 0" />
-          <LocationListWidget />
+          {/* <LocationListWidget /> */}
         </Box>
         <Box
           flexBasis={isNonMobileScreens ? "42%" : undefined}
