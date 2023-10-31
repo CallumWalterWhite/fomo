@@ -26,17 +26,17 @@ FOMO is a revolutionary social web app that connects party-goers with businesses
 To get started with FOMO, follow these simple steps:
 
 1. **Clone the Repository:**
-git clone https://github.com/yourusername/fomo.git
-cd fomo
+* git clone https://github.com/yourusername/fomo.git
+* cd fomo
 2. **Run Server:**
-cd server
-npm install
-npm run
+* cd server
+* npm install
+* npm run
 2. **Run Client:**
-cd client
-npm install
-npm run
-navigate to localhost:3000
+* cd client
+* npm install
+* npm run
+* navigate to localhost:3000
 
 ## License
 FOMO is licensed under the [MIT License](LICENSE), ensuring an open and collaborative environment for developers.
