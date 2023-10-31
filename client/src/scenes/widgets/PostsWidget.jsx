@@ -1,32 +1,28 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { setPosts } from "state";
 import PostWidget from "./PostWidget";
 
-const PostsWidget = ({ userId, isProfile = false }) => {
+const PostsWidget = ({ locationId, cityId, isProfile = false }) => {
   const dispatch = useDispatch();
-  const posts = useSelector((state) => state.posts);
-  const token = useSelector((state) => state.token);
+  const [posts, setPosts] = useState([]); 
 
   const getPosts = async () => {
-    const response = await fetch("http://localhost:6001/posts", {
-      method: "GET",
-      headers: { Authorization: `Bearer ${token}` },
+    const response = await fetch(`http://localhost:6001/posts/c/${cityId}`, {
+      method: "GET"
     });
     const data = await response.json();
-    dispatch(setPosts({ posts: data }));
+    dispatch(setPosts(data));
   };
 
   const getUserPosts = async () => {
     const response = await fetch(
-      `http://localhost:6001/posts/${userId}/posts`,
+      `http://localhost:6001/posts/${locationId}/posts`,
       {
-        method: "GET",
-        headers: { Authorization: `Bearer ${token}` },
+        method: "GET"
       }
     );
     const data = await response.json();
-    dispatch(setPosts({ posts: data }));
+    dispatch(setPosts(data));
   };
 
   useEffect(() => {
@@ -42,27 +38,24 @@ const PostsWidget = ({ userId, isProfile = false }) => {
       {posts.map(
         ({
           _id,
-          userId,
-          firstName,
-          lastName,
+          locationdata_id,
+          locationName,
+          locationCityId,
+          locationCityName,
           description,
-          location,
-          picturePath,
-          userPicturePath,
-          likes,
-          comments,
+          locationPath,
+          picturePath
         }) => (
           <PostWidget
             key={_id}
             postId={_id}
-            postUserId={userId}
-            name={`${firstName} ${lastName}`}
+            locationdata_id={locationdata_id}
+            locationName={locationName}
+            locationCityId={locationCityId}
+            locationCity={locationCityName}
             description={description}
-            location={location}
+            locationPath={locationPath}
             picturePath={picturePath}
-            userPicturePath={userPicturePath}
-            likes={likes}
-            comments={comments}
           />
         )
       )}

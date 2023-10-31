@@ -29,17 +29,18 @@ export const createPost = async (req, res) => {
 /* READ */
 export const getFeedPosts = async (req, res) => {
   try {
-    const post = await Post.find();
+    const { locationCityId } = req.params;
+    const post = await Post.find({locationCityId});
     res.status(200).json(post);
   } catch (err) {
     res.status(404).json({ message: err.message });
   }
 };
 
-export const getUserPosts = async (req, res) => {
+export const getLocationPosts = async (req, res) => {
   try {
-    const { userId } = req.params;
-    const post = await Post.find({ userId });
+    const { locationdata_id } = req.params;
+    const post = await Post.find({ locationdata_id });
     res.status(200).json(post);
   } catch (err) {
     res.status(404).json({ message: err.message });

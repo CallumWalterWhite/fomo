@@ -1,32 +1,28 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Box, Typography, useTheme } from "@mui/material";
+import { Link } from "react-router-dom"; // Import Link from react-router-dom
 import WidgetWrapper from "components/WidgetWrapper";
-import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { setLocations } from "state";
 
-const LocationListWidget = ({ userId }) => {
+const LocationListWidget = ({ cityId, cityName }) => {
   const dispatch = useDispatch();
   const { palette } = useTheme();
   const token = useSelector((state) => state.token);
-  const locations = useSelector((state) => state.locations || []);
+  const [locations, setlocations] = useState([]); 
 
   const getLocations = async () => {
     try {
-      const response = await fetch(`http://localhost:6001/location/all`, {
-        method: "GET",
-        headers: { Authorization: `Bearer ${token}` },
+      const response = await fetch(`http://localhost:6001/location/c/${cityId}`, {
+        method: "GET"
       });
 
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }
-
       const data = await response.json();
-      dispatch(setLocations({ locations: data }));
+      dispatch(setlocations(data));
     } catch (error) {
       console.error("Error fetching data:", error);
-      // Handle the error, show a message to the user, or retry the request
     }
   };
 
@@ -42,18 +38,33 @@ const LocationListWidget = ({ userId }) => {
         fontWeight="500"
         sx={{ mb: "1.5rem" }}
       >
-        Bars, Pubs and Clubs in City 
+        Bars, Pubs and Clubs in {cityName}
       </Typography>
       <Box
-          className="scroll-container"
-          maxHeight="300px"
-          overflowY="auto"
-          display="flex" 
-          flexDirection="column" 
-          gap="0.5rem"
+        className="scroll-container"
+        maxHeight="300px"
+        overflowY="auto"
+        display="flex"
+        flexDirection="column"
+        gap="0.5rem"
       >
         {locations.map((location) => (
-          <span key={location.id}>{location.title}</span>
+          <Link
+            to={`/profile/${location._id}`}
+            key={location._id}
+            style={{
+              textDecoration: "none", // Remove underline
+              color: palette.neutral.main, // Set link color to primary color
+              fontWeight: 500, // Set font weight to bold
+              fontSize: "1rem", // Set font size
+              transition: "color 0.3s ease", // Add smooth color transition
+            }}
+            // Hover effect to change text color on hover
+            onMouseEnter={(e) => (e.target.style.color = palette.neutral.dark)}
+            onMouseLeave={(e) => (e.target.style.color = palette.neutral.main)}
+          >
+            {location.title}
+          </Link>
         ))}
       </Box>
     </WidgetWrapper>

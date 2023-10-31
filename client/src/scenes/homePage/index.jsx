@@ -8,13 +8,14 @@ import Navbar from "scenes/navbar";
 import PostsWidget from "scenes/widgets/PostsWidget";
 import AdvertWidget from "scenes/widgets/AdvertWidget";
 import WidgetWrapper from "components/WidgetWrapper";
+import LocationListWidget from "scenes/widgets/LocationListWidget";
 import { setUserLocation } from "state";
 
 const HomePage = () => {
   const dispatch = useDispatch();
   const userLocation = useSelector((state) => state.currentLocation) || "";
   const isNonMobileScreens = useMediaQuery("(min-width:1000px)");
-  const [selectedLocation, setSelectedLocation] = useState(userLocation);
+  const [selectedLocation, setSelectedLocation] = useState(userLocation.Name);
   const [isModalOpen, setIsModalOpen] = useState(!userLocation);
   const [isModalReopened, setIsModalReopened] = useState(false);
   const [cities, setCities] = useState([]); 
@@ -62,20 +63,30 @@ const HomePage = () => {
             top: "50%",
             left: "50%",
             transform: "translate(-50%, -50%)",
-            bgcolor: "white",
+            bgcolor: palette.background.paper, // Set background color using palette
+            color: palette.text.primary, // Set text color using palette
             p: 3,
             minWidth: 300,
             textAlign: "center",
           }}
         >
-          <Select label="Select Location" value={selectedLocation} onChange={handleLocationChange}>
+          <Select
+            label="Select Location"
+            value={selectedLocation}
+            onChange={handleLocationChange}
+            sx={{ width: "100%", mb: 2, color: palette.text.primary }} // Set select styles using palette
+          >
             {cities.map((city) => (
               <MenuItem key={city.CityId} value={city}>
                 {city.Name}
               </MenuItem>
             ))}
           </Select>
-          <Button variant="contained" onClick={handleConfirm}>
+          <Button
+            variant="contained"
+            onClick={handleConfirm}
+            sx={{ backgroundColor: palette.primary.main, color: palette.primary.contrastText }} // Set button styles using palette
+          >
             Confirm
           </Button>
         </Box>
@@ -92,21 +103,20 @@ const HomePage = () => {
             <Box p="1rem 0">
               <Box display="flex" alignItems="center" gap="1rem" mb="0.5rem" onClick={handleLocationClick}>
                 <LocationOnOutlined fontSize="large" sx={{ color: main }} />
-                <Typography color={medium} style={{ cursor: "pointer" }}>
+                <Typography color={palette.text.primary} style={{ cursor: "pointer" }}>
                   {userLocation?.Name}
                 </Typography>
               </Box>
             </Box>
           </WidgetWrapper>
           <Box m="2rem 0" />
-          {/* <LocationListWidget /> */}
+          <LocationListWidget cityId={userLocation?.CityId} cityName={userLocation?.Name} />
         </Box>
         <Box
           flexBasis={isNonMobileScreens ? "42%" : undefined}
           mt={isNonMobileScreens ? undefined : "2rem"}
         >
-          {/* <MyPostWidget picturePath={picturePath} /> */}
-          <PostsWidget userId={null} />
+          <PostsWidget cityId={userLocation?.CityId} />
         </Box>
         {isNonMobileScreens && (
           <Box flexBasis="26%">

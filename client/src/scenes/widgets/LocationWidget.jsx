@@ -3,46 +3,44 @@ import {
   LocationOnOutlined,
 } from "@mui/icons-material";
 import { Box, Typography, Divider, useTheme } from "@mui/material";
-import UserImage from "components/UserImage";
+import LocationImage from "components/LocationImage";
 import FlexBetween from "components/FlexBetween";
 import WidgetWrapper from "components/WidgetWrapper";
 import { useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-const UserWidget = ({ userId, picturePath }) => {
-  const [user, setUser] = useState(null);
+const LocationWidget = ({ locationId, picturePath }) => {
+  const [location, setLocation] = useState(null);
   const { palette } = useTheme();
   const navigate = useNavigate();
-  const token = useSelector((state) => state.token);
   const dark = palette.neutral.dark;
   const medium = palette.neutral.medium;
   const main = palette.neutral.main;
 
-  const getUser = async () => {
-    const response = await fetch(`http://localhost:6001/users/${userId}`, {
-      method: "GET",
-      headers: { Authorization: `Bearer ${token}` },
+  const getLocation = async () => {
+    const response = await fetch(`http://localhost:6001/location/${locationId}`, {
+      method: "GET"
     });
     const data = await response.json();
-    setUser(data);
+    setLocation(data);
   };
 
   useEffect(() => {
-    getUser();
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+    getLocation();
+  }, []); 
 
-  if (!user) {
+  if (!location) {
     return null;
   }
 
   const {
-    firstName,
-    lastName,
-    location,
-    viewedProfile,
-    impressions,
-  } = user;
+    _id,
+    title,
+    thumbnail,
+    complete_address,
+    description
+  } = location;
 
   return (
     <WidgetWrapper>
@@ -50,10 +48,10 @@ const UserWidget = ({ userId, picturePath }) => {
       <FlexBetween
         gap="0.5rem"
         pb="1.1rem"
-        onClick={() => navigate(`/profile/${userId}`)}
+        onClick={() => navigate(`/profile/${_id}`)}
       >
         <FlexBetween gap="1rem">
-          <UserImage image={picturePath} />
+          <LocationImage image={thumbnail} />
           <Box>
             <Typography
               variant="h4"
@@ -66,7 +64,7 @@ const UserWidget = ({ userId, picturePath }) => {
                 },
               }}
             >
-              {firstName} {lastName}
+              {title}
             </Typography>
           </Box>
         </FlexBetween>
@@ -78,11 +76,16 @@ const UserWidget = ({ userId, picturePath }) => {
       <Box p="1rem 0">
         <Box display="flex" alignItems="center" gap="1rem" mb="0.5rem">
           <LocationOnOutlined fontSize="large" sx={{ color: main }} />
-          <Typography color={medium}>{location}</Typography>
+          <Typography color={medium}>{complete_address.city}</Typography>
+        </Box>
+        <Box display="flex" alignItems="center" gap="1rem" mb="0.5rem">
+          <Typography className="info-item">
+            {location.description}
+          </Typography>
         </Box>
       </Box>
     </WidgetWrapper>
   );
 };
 
-export default UserWidget;
+export default LocationWidget;
