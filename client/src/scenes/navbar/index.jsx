@@ -4,11 +4,10 @@ import {
   IconButton,
   InputBase,
   Typography,
-  Select,
-  MenuItem,
-  FormControl,
+  Link,
   useTheme,
   useMediaQuery,
+  Popover
 } from "@mui/material";
 import {
   Search,
@@ -30,8 +29,21 @@ const Navbar = () => {
   const [isMobileMenuToggled, setIsMobileMenuToggled] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const user = useSelector((state) => state.user);
   const isNonMobileScreens = useMediaQuery("(min-width: 1000px)");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+  const [anchorEl, setAnchorEl] = useState(null);
+
+  const handleSearch = async () => {
+    try {
+      const response = await fetch(`http://localhost:6001/location/search/${searchTerm}`);
+      const data = await response.json();
+      setSearchResults(data);
+      setAnchorEl(document.getElementById("search-input"));
+    } catch (error) {
+      console.error("Error fetching search results: ", error);
+    }
+  };
 
   const theme = useTheme();
   const neutralLight = theme.palette.neutral.light;
@@ -57,16 +69,46 @@ const Navbar = () => {
           FOMO
         </Typography>
         {isNonMobileScreens && (
-          <FlexBetween
-            backgroundColor={neutralLight}
-            borderRadius="9px"
-            gap="3rem"
-            padding="0.1rem 1.5rem"
-          >
-            <InputBase placeholder="Search..." />
-            <IconButton>
+           <FlexBetween backgroundColor={neutralLight} borderRadius="9px" gap="3rem" padding="0.1rem 1.5rem">
+            <InputBase
+              placeholder="Search..."
+              id="search-input"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+            <IconButton onClick={handleSearch}>
               <Search />
             </IconButton>
+            {/* Popover displaying search results */}
+            <Popover
+              open={Boolean(anchorEl)}
+              anchorEl={anchorEl}
+              onClose={() => setAnchorEl(null)}
+              anchorOrigin={{
+                vertical: 'bottom',
+                horizontal: 'left',
+              }}
+              transformOrigin={{
+                vertical: 'top',
+                horizontal: 'left',
+              }}
+            >
+              <Box p={2}>
+                {searchResults.map((result) => (
+                  <Link style={{
+                    textDecoration: "none"}} key={result._id} href={`/profile/${result._id}`} target="_blank" rel="noopener noreferrer">
+                    <Typography style={{
+                      textDecoration: "none", // Remove underline
+                      color: theme.palette.neutral.main, // Set link color to primary color
+                      transition: "color 0.3s ease", // Add smooth color transition
+                      cursor: "pointer", // Add pointer on hover
+                    }}
+                    onMouseEnter={(e) => (e.target.style.color = theme.palette.neutral.dark)}
+                    onMouseLeave={(e) => (e.target.style.color = theme.palette.neutral.main)}>{result.title}</Typography>
+                  </Link>
+                ))}
+              </Box>
+            </Popover>
           </FlexBetween>
         )}
       </FlexBetween>

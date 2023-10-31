@@ -21,6 +21,17 @@ export const getLocation = async (req, res) => {
   }
 };
 
+export const getLocationSearch = async (req, res) => {
+  try {
+    const { term } = req.params;
+    const locations = await Location.find({ term: { $regex: '.*title.*' } }).limit(5);
+    res.status(200).json(locations);
+  } catch (err) {
+    res.status(404).json({ message: err.message });
+  }
+};
+
+
 export const getCities = async (req, res) => {
   try {
     const cities = await City.find();

@@ -58,6 +58,7 @@ const LocationListWidget = ({ cityId, cityName }) => {
               fontWeight: 500, // Set font weight to bold
               fontSize: "1rem", // Set font size
               transition: "color 0.3s ease", // Add smooth color transition
+              cursor: "pointer", // Add pointer on hover
             }}
             // Hover effect to change text color on hover
             onMouseEnter={(e) => (e.target.style.color = palette.neutral.dark)}
