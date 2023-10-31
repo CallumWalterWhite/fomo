@@ -5,3 +5,4 @@ queries = [
     },
 ]
 number_of_scrapers = 16
+city_id = 2

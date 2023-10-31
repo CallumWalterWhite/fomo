@@ -110,13 +110,13 @@ const HomePage = () => {
             </Box>
           </WidgetWrapper>
           <Box m="2rem 0" />
-          <LocationListWidget cityId={userLocation?.CityId} cityName={userLocation?.Name} />
+          {userLocation && <LocationListWidget cityId={userLocation?.CityId} cityName={userLocation?.Name} />}
         </Box>
         <Box
           flexBasis={isNonMobileScreens ? "42%" : undefined}
           mt={isNonMobileScreens ? undefined : "2rem"}
         >
-          <PostsWidget cityId={userLocation?.CityId} />
+          {userLocation && <PostsWidget cityId={userLocation?.CityId} />}
         </Box>
         {isNonMobileScreens && (
           <Box flexBasis="26%">
