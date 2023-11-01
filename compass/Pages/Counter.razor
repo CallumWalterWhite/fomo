@@ -1,4 +1,6 @@
 ﻿@page "/counter"
+@using compass.Services
+@inject IPostService postService;
 
 <PageTitle>Counter</PageTitle>
 
@@ -13,6 +15,7 @@
 
     private void IncrementCount()
     {
+        postService.GetPost("6541143c944ce1e1726395b0");
         currentCount++;
     }
 }
