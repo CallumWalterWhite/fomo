@@ -188,7 +188,7 @@ const locationSchema = new mongoose.Schema({
     type: String
   },
   CityId: {
-    type: [Number]
+    type: Number
   }
 });
 

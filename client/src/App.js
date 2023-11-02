@@ -1,6 +1,7 @@
 import { BrowserRouter, Navigate, Routes, Route } from "react-router-dom";
 import HomePage from "scenes/homePage";
 import ProfilePage from "scenes/profilePage";
+import NightPlannerPage from "scenes/nightplanner";
 import { useMemo } from "react";
 import { useSelector } from "react-redux";
 import { CssBaseline, ThemeProvider } from "@mui/material";
@@ -20,6 +21,7 @@ function App() {
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/profile/:locationId" element={<ProfilePage />} />
+            <Route path="/nightplanner" element={<NightPlannerPage />} />
           </Routes>
         </ThemeProvider>
       </BrowserRouter>

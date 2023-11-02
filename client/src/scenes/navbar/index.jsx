@@ -45,6 +45,13 @@ const Navbar = () => {
     }
   };
 
+  
+  const handleEnterKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
+  };
+
   const theme = useTheme();
   const neutralLight = theme.palette.neutral.light;
   const dark = theme.palette.neutral.dark;
@@ -75,6 +82,7 @@ const Navbar = () => {
               id="search-input"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
+              onKeyUp={handleEnterKeyPress}
             />
             <IconButton onClick={handleSearch}>
               <Search />
@@ -104,7 +112,7 @@ const Navbar = () => {
                       cursor: "pointer", // Add pointer on hover
                     }}
                     onMouseEnter={(e) => (e.target.style.color = theme.palette.neutral.dark)}
-                    onMouseLeave={(e) => (e.target.style.color = theme.palette.neutral.main)}>{result.title}</Typography>
+                    onMouseLeave={(e) => (e.target.style.color = theme.palette.neutral.main)}>{result.title} - {result.complete_address.city}</Typography>
                   </Link>
                 ))}
               </Box>
