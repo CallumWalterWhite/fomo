@@ -56,6 +56,7 @@ class MongoDBImport():
                 data_list = json.load(file)
                 for row in data_list:
                     row['CityId'] = city_id
+                    row['searchterm'] = row['title'].lower()
                 return data_list
         data_to_insert = get_json_data(path_to_json)
         try:

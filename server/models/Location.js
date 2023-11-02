@@ -5,6 +5,9 @@ const locationSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  searchterm: {
+    type: String,
+  },
   link: {
     type: String,
     required: true
