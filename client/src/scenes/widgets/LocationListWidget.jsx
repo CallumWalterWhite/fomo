@@ -12,7 +12,7 @@ const LocationListWidget = ({ cityId, cityName }) => {
 
   const getLocations = async () => {
     try {
-      const response = await fetch(`http://localhost:6001/location/c/${cityId}`, {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/location/c/${cityId}`, {
         method: "GET"
       });
 

@@ -30,7 +30,7 @@ const HomePage = () => {
   
   const fetchData = async () => {
     try {
-      const response = await fetch("http://localhost:6001/cities");
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/cities`);
       const data = await response.json();
       setCities(data);
     } catch (error) {

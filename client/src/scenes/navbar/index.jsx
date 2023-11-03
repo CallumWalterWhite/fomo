@@ -36,7 +36,7 @@ const Navbar = () => {
 
   const handleSearch = async () => {
     try {
-      const response = await fetch(`http://localhost:6001/location/search/${searchTerm}`);
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/location/search/${searchTerm}`);
       const data = await response.json();
       setSearchResults(data);
       setAnchorEl(document.getElementById("search-input"));

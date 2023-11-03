@@ -19,7 +19,7 @@ const LocationWidget = ({ locationId, picturePath }) => {
   const main = palette.neutral.main;
 
   const getLocation = async () => {
-    const response = await fetch(`http://localhost:6001/location/${locationId}`, {
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/location/${locationId}`, {
       method: "GET"
     });
     const data = await response.json();

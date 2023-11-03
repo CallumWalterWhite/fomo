@@ -2,12 +2,16 @@ version: '3.4'
 
 services:
   client:
+    image: fomouksdevacr.azurecr.io/fomo-client:latest
     build:
       context: ./client
       dockerfile: ./Dockerfile
     ports:
       - 3000:3000
+    environment:
+      - REACT_APP_API_URL=http://localhost:6001
   api:
+    image: fomouksdevacr.azurecr.io/fomo-api:latest
     build: 
       context: ./server
       dockerfile: ./Dockerfile

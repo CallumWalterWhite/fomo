@@ -7,7 +7,7 @@ const PostsWidget = ({ locationId, cityId, isProfile = false }) => {
   const [posts, setPosts] = useState([]); 
 
   const getPosts = async () => {
-    const response = await fetch(`http://localhost:6001/posts/c/${cityId}`, {
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/posts/c/${cityId}`, {
       method: "GET"
     });
     const data = await response.json();
@@ -16,7 +16,7 @@ const PostsWidget = ({ locationId, cityId, isProfile = false }) => {
 
   const getUserPosts = async () => {
     const response = await fetch(
-      `http://localhost:6001/posts/${locationId}/posts`,
+      `${process.env.REACT_APP_API_URL}/posts/${locationId}/posts`,
       {
         method: "GET"
       }
