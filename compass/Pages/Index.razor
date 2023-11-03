@@ -1,9 +1,50 @@
 ﻿@page "/"
+@using compass.Services
+@inject ILocationService _locationService;
 
-<PageTitle>Index</PageTitle>
+<PageTitle>Home</PageTitle>
 
-<h1>Hello, world!</h1>
+<h1>Welcome to FOMO Compass</h1>
+<p>FOMO Compass is your ultimate guide to managing locations and posts in the FOMO social network application. Stay connected and never miss out on the latest happenings!</p>
 
-Welcome to your new app.
+<MudContainer>
+    <MudGrid Justify="Justify.Center" Align="Align.Center" Class="mt-4">
+        <MudCol Class="m-2">
+            <MudCard>
+                <MudCardContent>
+                    <MudText Typo="Typo.h5">All Cities</MudText>
+                    <MudText Typo="Typo.body1">@AllCities</MudText>
+                </MudCardContent>
+            </MudCard>
+        </MudCol>
+        <MudCol Class="m-2">
+            <MudCard>
+                <MudCardContent>
+                    <MudText Typo="Typo.h5">Derby</MudText>
+                    <MudText Typo="Typo.body1">@Derby</MudText>
+                </MudCardContent>
+            </MudCard>
+        </MudCol>
+        <MudCol Class="m-2">
+            <MudCard>
+                <MudCardContent>
+                    <MudText Typo="Typo.h5">Nottingham</MudText>
+                    <MudText Typo="Typo.body1">@Nottingham</MudText>
+                </MudCardContent>
+            </MudCard>
+        </MudCol>
+    </MudGrid>
+</MudContainer>
 
-<SurveyPrompt Title="How is Blazor working for you?" />
+@code{
+    public int AllCities = 0;
+    public int Derby = 0;
+    public int Nottingham = 0;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        AllCities = _locationService.GetLocations(0, 0).Count;
+        Derby = _locationService.GetLocations(1, 0).Count;
+        Nottingham = _locationService.GetLocations(2, 0).Count;
+    }
+}

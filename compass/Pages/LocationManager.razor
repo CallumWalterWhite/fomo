@@ -1,0 +1,182 @@
+﻿@page "/location"
+@using compass.Services
+@inject ILocationService _locationService;
+@inject NavigationManager NavigationManager;
+
+<MudContainer>
+    <MudGrid>
+        <MudItem xs="12" sm="6" md="4" lg="3">
+            <MudSelect T="City" 
+                    ToStringFunc="@converterCity"
+                    ValueChanged="OnCityValueChanged" 
+                    Label="Cities" 
+                    Variant="Variant.Filled" 
+                    AnchorOrigin="Origin.BottomCenter">
+                <MudSelectItem Value="@(new City(0, "All"))" />
+                <MudSelectItem Value="@(new City(1, "Derby"))" />
+                <MudSelectItem Value="@(new City(2, "Nottingham"))" />
+            </MudSelect>
+        </MudItem>
+        <MudItem xs="12" sm="6" md="4" lg="3">
+            <MudSelect T="LocationType" 
+                    ToStringFunc="@converterLocationType"
+                    ValueChanged="OnLocationTypeValueChanged" 
+                    Label="Location Type" 
+                    Variant="Variant.Filled" 
+                    AnchorOrigin="Origin.BottomCenter">
+                <MudSelectItem Value="@(new LocationType(0, "All"))" />
+                <MudSelectItem Value="@(new LocationType(1, "Bars"))" />
+                <MudSelectItem Value="@(new LocationType(2, "Pubs"))" />
+                <MudSelectItem Value="@(new LocationType(3, "Nightclubs"))" />
+            </MudSelect>
+        </MudItem>
+    </MudGrid>
+    <MudTable T="Location" ServerData="@(new Func<TableState, Task<TableData<Location>>>(ServerReload))"
+          Dense="true" Hover="true" @ref="table"  OnRowClick="@RowClicked" >
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">Locations</MudText>
+        <MudSpacer />
+        <MudTextField T="string" ValueChanged="@(s=>OnSearch(s))" Placeholder="Search" Adornment="Adornment.Start"
+                      AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh><MudTableSortLabel SortLabel="title_field" T="Location">Title</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortLabel="city_field" T="Location">City</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortLabel="description_field" T="Location">Description</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortLabel="address_field" T="Location">Address</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortLabel="reviews_field" T="Location">Reviews</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortLabel="ratings_field" T="Location">Ratings</MudTableSortLabel></MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Title">@context.Title</MudTd>
+        <MudTd DataLabel="City">@context.CompleteAddress.City</MudTd>
+        <MudTd DataLabel="Description">@context.Description</MudTd>
+        <MudTd DataLabel="Address">@context.Address</MudTd>
+        <MudTd DataLabel="Reviews">@context.Reviews</MudTd>
+        <MudTd DataLabel="Ratings">@context.Rating</MudTd>
+    </RowTemplate>
+    <NoRecordsContent>
+        <MudText>No matching records found</MudText>
+    </NoRecordsContent>
+    <LoadingContent>
+        <MudText>Loading...</MudText>
+    </LoadingContent>
+    <PagerContent>
+        <MudTablePager />
+    </PagerContent>
+    </MudTable>
+</MudContainer>
+@code {
+
+    private City? selectedCity {get; set;}
+    readonly Func<City, string> converterCity = p => p?.Title ?? "All";
+    private LocationType? selectedLocationType {get; set;}
+    readonly Func<LocationType, string> converterLocationType =p => p?.Title ?? "All";
+    
+    public class City
+    {
+        public City(int id, string title)
+        {
+            Id = id;
+            Title = title;
+        }
+        
+        public int Id { get; set; }
+        
+        public string Title { get; set; }
+
+        public override bool Equals(object o)
+        {
+            var other = o as City;
+            return other?.Title == Title;
+        }
+
+        public override int GetHashCode() => Title?.GetHashCode() ?? 0;
+
+        public override string ToString() => Title;
+    }
+
+    public class LocationType
+    {
+        public LocationType(int id, string title)
+        {
+            Id = id;
+            Title = title;
+        }
+        
+        public int Id { get; set; }
+        
+        public string Title { get; set; }
+
+        public override bool Equals(object o)
+        {
+            var other = o as LocationType;
+            return other?.Title == Title;
+        }
+
+        public override int GetHashCode() => Title?.GetHashCode() ?? 0;
+
+        public override string ToString() => Title;
+    }
+    
+    private void OnCityValueChanged(City selected)
+    {
+        selectedCity = selected;
+        table.ReloadServerData();
+    }
+
+    private void OnLocationTypeValueChanged(LocationType selected)
+    {
+        selectedLocationType = selected;
+        table.ReloadServerData();
+    }
+
+    private IEnumerable<Location> pagedData;
+    private MudTable<Location> table;
+
+    private int totalItems;
+    private string searchString = null;
+    /// <summary>
+    /// Here we simulate getting the paged, filtered and ordered data from the server
+    /// </summary>
+    private async Task<TableData<Location>> ServerReload(TableState state)
+    {
+        IList<Location> data = _locationService.GetLocations(selectedCity?.Id ?? 0, selectedLocationType?.Id ?? 0, searchString);
+        totalItems = data.Count;
+        switch (state.SortLabel)
+        {
+            case "title_field":
+                data = data.OrderByDirection(state.SortDirection, o => o.Title).ToList();
+                break;
+            case "city_field":
+                data = data.OrderByDirection(state.SortDirection, o => o.CompleteAddress.City).ToList();
+                break;
+            case "description_field":
+                data = data.OrderByDirection(state.SortDirection, o => o.Description).ToList();
+                break;
+            case "address_field":
+                data = data.OrderByDirection(state.SortDirection, o => o.Address).ToList();
+                break;
+            case "reviews_field":
+                data = data.OrderByDirection(state.SortDirection, o => o.Reviews).ToList();
+                break;
+            case "ratings_field":
+                data = data.OrderByDirection(state.SortDirection, o => o.Rating).ToList();
+                break;
+        }
+
+        pagedData = data.Skip(state.Page * state.PageSize).Take(state.PageSize).ToArray();
+        return new TableData<Location>() {TotalItems = totalItems, Items = pagedData};
+    }
+
+    private void OnSearch(string text)
+    {
+        searchString = text;
+        table.ReloadServerData();
+    }
+    
+    public void RowClicked(TableRowClickEventArgs<Location> p)
+    {
+        NavigationManager.NavigateTo($"/location/{p.Item.Id}");
+    }
+}

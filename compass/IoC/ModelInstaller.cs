@@ -26,5 +26,6 @@ public static class ModelInstaller
             return mongoClient.GetDatabase(mongodbDatabaseSettings.DatabaseName);
         });
         serviceCollection.AddScoped(typeof(IRepository<Post>), typeof(PostRepository));
+        serviceCollection.AddScoped(typeof(IRepository<Location>), typeof(LocationRepository));
     }
 }

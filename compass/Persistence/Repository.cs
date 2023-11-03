@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using compass.Models;
 using MongoDB.Driver;
 
@@ -13,19 +14,21 @@ public abstract class Repository<T>
         _entities = entities;
     }
     
-    public List<T> Get() => _entities.Find(game => true).ToList();
+    public List<T> Get() => _entities.Find(entity => true).ToList();
+    
+    public List<T> Get(Expression<Func<T,bool>> filter) => _entities.Find(filter).ToList();
 
-    public T Get(string id) => _entities.Find(game => game.Id == id).FirstOrDefault();
+    public T Get(string id) => _entities.Find(entity => entity.Id == id).FirstOrDefault();
 
-    public T Create(T game)
+    public T Create(T entity)
     {
-        _entities.InsertOne(game);
-        return game;
+        _entities.InsertOne(entity);
+        return entity;
     }
 
-    public void Update(string id, T updatedT) => _entities.ReplaceOne(game => game.Id == id, updatedT);
+    public void Update(string id, T updatedT) => _entities.ReplaceOne(entity => entity.Id == id, updatedT);
 
-    public void Delete(T gameForDeletion) => _entities.DeleteOne(game => game.Id == gameForDeletion.Id);
+    public void Delete(T entityForDeletion) => _entities.DeleteOne(entity => entity.Id == entityForDeletion.Id);
 
-    public void Delete(string id) => _entities.DeleteOne(game => game.Id == id);
+    public void Delete(string id) => _entities.DeleteOne(entity => entity.Id == id);
 }

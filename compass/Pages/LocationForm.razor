@@ -1,0 +1,162 @@
+﻿@page "/location/{Id}"
+@using compass.Services
+@inject ILocationService _locationService;
+@inject NavigationManager NavigationManager;
+
+@if (location is not null)
+{
+   
+<div class="container mt-5">
+    <h3 class="mb-4">@location.Title</h3>
+    <MudPaper Class="p-4">
+        <MudForm T="Location">
+            <div class="row">
+                <div class="col-md-6">
+                    <MudTextField Label="Title" @bind-Value="location.Title" Required="true" Class="mb-4" />
+                    <MudTextField Label="Search Term" @bind-Value="location.SearchTerm" Class="mb-4" />
+                    <MudTextField Label="Link" @bind-Value="location.Link" Required="true" Class="mb-4" />
+                    <MudTextField Label="Main Category" @bind-Value="location.MainCategory" Class="mb-4" />
+                    <MudNumericField Label="Rating" @bind-Value="location.Rating" Class="mb-4" />
+                    <MudNumericField Label="Reviews" @bind-Value="location.Reviews" Class="mb-4" />
+                    <MudTextField Label="Website" @bind-Value="location.Website" Class="mb-4" />
+                </div>
+                <div class="col-md-6">
+                    <MudTextField Label="Phone" @bind-Value="location.Phone" Class="mb-4" />
+                    <MudTextField Label="Address" @bind-Value="location.Address" Class="mb-4" />
+                    <MudTextField Label="Place ID" @bind-Value="location.PlaceId" Class="mb-4" />
+                    <MudTextField Label="Status" @bind-Value="location.Status" Class="mb-4" />
+                    <MudTextField Label="Price Range" @bind-Value="location.PriceRange" Class="mb-4" />
+                    <MudTextField Label="Description" @bind-Value="location.Description" Class="mb-4" />
+                </div>
+            </div>
+
+            <!-- Images -->
+            <MudTextField Label="Image Thumbnail" @bind-Value="imageInfo.Thumbnail" Class="mb-4" />
+            <MudTextField Label="Image Title" @bind-Value="imageInfo.Title" Class="mb-4" />
+            <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="AddImage">Add Image</MudButton>
+
+            <!-- Opening Hours -->
+            <MudTextField Label="Day" @bind-Value="openingHours.Day" Class="mb-4" />
+            <MudTextField Label="Opening Times" @bind-Value="openingHours.Times" Class="mb-4" />
+            <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="AddOpeningHours">Add Opening Hours</MudButton>
+
+            <!-- Menu Info -->
+            <MudTextField Label="Menu Link" @bind-Value="menuInfo.Link" Class="mb-4" />
+            <MudTextField Label="Menu Source" @bind-Value="menuInfo.Source" Class="mb-4" />
+
+            <!-- Order Online Links -->
+            <MudTextField Label="Order Online Link" @bind-Value="orderOnlineLink.Link" Class="mb-4" />
+            <MudTextField Label="Order Online Source" @bind-Value="orderOnlineLink.Source" Class="mb-4" />
+            <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="AddOrderOnlineLink">Add Order Online Link</MudButton>
+
+            <!-- Reservation Links -->
+            <MudTextField Label="Reservation Link" @bind-Value="reservationLink.Link" Class="mb-4" />
+            <MudTextField Label="Reservation Source" @bind-Value="reservationLink.Source" Class="mb-4" />
+            <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="AddReservationLink">Add Reservation Link</MudButton>
+
+            <!-- Categories -->
+            <MudTextField Label="Category" @bind-Value="category" Class="mb-4" />
+            <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="AddCategory">Add Category</MudButton>
+
+            <!-- Complete Address -->
+            <MudTextField Label="Borough" @bind-Value="completeAddress.Borough" Class="mb-4" />
+            <MudTextField Label="City" @bind-Value="completeAddress.City" Class="mb-4" />
+            <MudTextField Label="Country Code" @bind-Value="completeAddress.CountryCode" Class="mb-4" />
+            <MudTextField Label="Postal Code" @bind-Value="completeAddress.PostalCode" Class="mb-4" />
+            <MudTextField Label="State" @bind-Value="completeAddress.State" Class="mb-4" />
+            <MudTextField Label="Street" @bind-Value="completeAddress.Street" Class="mb-4" />
+
+            <MudTextField Label="Plus Code" @bind-Value="location.PlusCode" Class="mb-4" />
+            <MudTextField Label="Time Zone" @bind-Value="location.TimeZone" Class="mb-4" />
+            <MudTextField Label="CID" @bind-Value="location.Cid" Class="mb-4" />
+            <MudTextField Label="Data ID" @bind-Value="location.DataId" Class="mb-4" />
+            <MudNumericField Label="City ID" @bind-Value="location.CityId" Class="mb-4" />
+
+            <div class="text-center mt-4">
+                <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="SubmitForm">Update</MudButton>
+                <MudButton Color="Color.Secondary" Variant="Variant.Filled" OnClick="DeleteForm">Delete</MudButton>
+            </div>
+        </MudForm>
+    </MudPaper>
+</div>
+}
+@code {
+    [Parameter]
+    public string Id { get; set; }
+    
+    public Location? location = null;
+    private ImageInfo imageInfo = new ImageInfo();
+    private OpeningHours openingHours = new OpeningHours();
+    private MenuInfo menuInfo = new MenuInfo();
+    private OrderOnlineLink orderOnlineLink = new OrderOnlineLink();
+    private ReservationLink reservationLink = new ReservationLink();
+    private string category;
+    private CompleteAddress completeAddress = new CompleteAddress();
+    
+    protected override async Task OnInitializedAsync()
+    {
+        location = _locationService.GetLocation(Id);
+    }
+    
+    private void AddImage()
+    {
+        location.Images ??= new List<ImageInfo>();
+        location.Images.Add(new ImageInfo
+        {
+            Thumbnail = imageInfo.Thumbnail,
+            Title = imageInfo.Title
+        });
+        imageInfo = new ImageInfo();
+    }
+
+    private void AddOpeningHours()
+    {
+        location.Hours ??= new List<OpeningHours>();
+        location.Hours.Add(new OpeningHours
+        {
+            Day = openingHours.Day,
+            //Times = new List<string> { openingHours.Times }
+        });
+        openingHours = new OpeningHours();
+    }
+
+    private void AddOrderOnlineLink()
+    {
+        location.OrderOnlineLinks ??= new List<OrderOnlineLink>();
+        location.OrderOnlineLinks.Add(new OrderOnlineLink
+        {
+            Link = orderOnlineLink.Link,
+            Source = orderOnlineLink.Source
+        });
+        orderOnlineLink = new OrderOnlineLink();
+    }
+
+    private void AddReservationLink()
+    {
+        location.Reservations ??= new List<ReservationLink>();
+        location.Reservations.Add(new ReservationLink
+        {
+            Link = reservationLink.Link,
+            Source = reservationLink.Source
+        });
+        reservationLink = new ReservationLink();
+    }
+
+    private void AddCategory()
+    {
+        location.Categories ??= new List<string>();
+        location.Categories.Add(category);
+        category = string.Empty;
+    }
+    
+    private void SubmitForm()
+    {
+        _locationService.UpdateLocation(location);
+    }
+    
+    private void DeleteForm()
+    {
+        _locationService.DeleteLocation(location.Id);
+        NavigationManager.NavigateTo($"/location");
+    }
+}
