@@ -7,7 +7,11 @@ def run_tasks():
     count = LocalStorage.get_item('count', 0)
 
 def run_import(): 
-    MongoDBImport().import_data('output/all.json') 
+    path = str(input("Enter path, leave blank for 'all': "))
+    if path == "":
+        path = "all.json"
+    city_id = int(input("Enter city id: "))
+    MongoDBImport().import_data('output/' + path + '.json', city_id)
 
 options = {
     "Run tasks": run_tasks,

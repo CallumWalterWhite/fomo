@@ -18,10 +18,10 @@ public class Location : Entity
     public string MainCategory { get; set; }
 
     [BsonElement("rating")]
-    public double Rating { get; set; }
+    public double? Rating { get; set; }
 
     [BsonElement("reviews")]
-    public int Reviews { get; set; }
+    public int? Reviews { get; set; }
 
     [BsonElement("website")]
     public string Website { get; set; }
@@ -45,7 +45,7 @@ public class Location : Entity
     public string Description { get; set; }
 
     [BsonElement("reviews_per_rating")]
-    public Dictionary<string, int> ReviewsPerRating { get; set; }
+    public Dictionary<string, int?>? ReviewsPerRating { get; set; }
 
     [BsonElement("reviews_link")]
     public string ReviewsLink { get; set; }
@@ -54,25 +54,25 @@ public class Location : Entity
     public string Thumbnail { get; set; }
 
     [BsonElement("images")]
-    public List<ImageInfo> Images { get; set; }
+    public List<ImageInfo>? Images { get; set; }
 
     [BsonElement("hours")]
-    public List<OpeningHours> Hours { get; set; }
+    public List<OpeningHours>? Hours { get; set; }
 
     [BsonElement("menu")]
-    public MenuInfo Menu { get; set; }
+    public MenuInfo? Menu { get; set; }
 
     [BsonElement("order_online_links")]
-    public List<OrderOnlineLink> OrderOnlineLinks { get; set; }
+    public List<OrderOnlineLink>? OrderOnlineLinks { get; set; }
 
     [BsonElement("reservations")]
-    public List<ReservationLink> Reservations { get; set; }
+    public List<ReservationLink>? Reservations { get; set; }
 
     /*[BsonElement("owner")]
     public OwnerInfo? Owner { get; set; }*/
 
     [BsonElement("categories")]
-    public List<string> Categories { get; set; }
+    public List<string>? Categories { get; set; }
 
     /*[BsonElement("coordinates")]
     public Coordinates Coordinates { get; set; }*/
@@ -81,7 +81,7 @@ public class Location : Entity
     public string PlusCode { get; set; }
 
     [BsonElement("complete_address")]
-    public CompleteAddress CompleteAddress { get; set; }
+    public CompleteAddress? CompleteAddress { get; set; }
 
     [BsonElement("time_zone")]
     public string TimeZone { get; set; }

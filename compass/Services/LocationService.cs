@@ -21,10 +21,29 @@ public class LocationService : ILocationService
 
     public IList<Location> GetLocations(int cityId, int locationType, string searchTerm)
     {
-        IEnumerable<Location> locations = _locationRepository.Get((location) => 
-            cityId <= 0 || location.CityId == cityId 
-            && locationType <= 0 || location.MainCategory ==
-            (locationType == 1 ? "Bar" : locationType == 1 ? "Pub" : "Nightclub"));
+        IEnumerable<Location> locations;
+        if (cityId == 0 && locationType == 0)
+        {
+            locations = _locationRepository.Get((location) => true);
+        }
+        else if (cityId > 0 && locationType == 0)
+        {
+            locations = _locationRepository.Get((location) =>
+                location.CityId == cityId);
+        }
+        else if (cityId == 0 && locationType > 0)
+        {
+            locations = _locationRepository.Get((location) =>
+                location.MainCategory ==
+                (locationType == 1 ? "Bar" : locationType == 2 ? "Pub" : "Nightclub"));
+        }
+        else
+        {
+            locations = _locationRepository.Get((location) => 
+                cityId <= 0 || location.CityId == cityId 
+                && locationType <= 0 || location.MainCategory ==
+                (locationType == 1 ? "Bar" : locationType == 2 ? "Pub" : "Nightclub"));
+        }
         if (!searchTerm.IsNullOrEmpty())
         {
             locations = locations.Where(x => x.SearchTerm.Contains(searchTerm));

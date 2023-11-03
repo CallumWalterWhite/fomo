@@ -1,0 +1,20 @@
+version: '3.4'
+
+services:
+  client:
+    build:
+      context: ./client
+      dockerfile: ./Dockerfile
+    ports:
+      - 3000:3000
+  api:
+    build: 
+      context: ./server
+      dockerfile: ./Dockerfile
+    ports:
+      - 6001:6001 
+    environment:
+      - MONGO_URL=mongodb+srv://admin:admin@cluster0.xsplmq9.mongodb.net/?retryWrites=true&w=majority/fomo
+    volumes:
+      - ./server:/usr/src/app
+      - /usr/src/app/node_modules

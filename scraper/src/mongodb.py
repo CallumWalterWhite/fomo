@@ -13,7 +13,7 @@ class MongoDBImportTask(BaseTask):
 
 class MongoDBImport():
     def __init__(self):
-        self.client = MongoClient('mongodb://127.0.0.1:27017')
+        self.client = MongoClient('mongodb+srv://callumwhi0:$aygon01@cluster0.xsplmq9.mongodb.net/?retryWrites=true&w=majority')
         self.db = self.client['fomo'] #set up to run against fomo database
         self.collection = self.db['locations']
 
@@ -50,12 +50,12 @@ class MongoDBImport():
         for key, value in row.items():
             row[key] = self.convert_large_integers(value)
 
-    def import_data(self, path_to_json):
+    def import_data(self, path_to_json, input_city_id = city_id):
         def get_json_data(json_file):
             with open(json_file, 'r', encoding="utf8") as file:
                 data_list = json.load(file)
                 for row in data_list:
-                    row['CityId'] = city_id
+                    row['CityId'] = input_city_id
                     row['searchterm'] = row['title'].lower()
                 return data_list
         data_to_insert = get_json_data(path_to_json)
