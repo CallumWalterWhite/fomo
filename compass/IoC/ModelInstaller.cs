@@ -9,23 +9,28 @@ namespace compass.IoC;
 
 public static class ModelInstaller
 {
-    public static void InstallModel(this IServiceCollection serviceCollection, ConfigurationManager configurationManager)
+    public static void InstallModel(this IServiceCollection serviceCollection)
     {
-        serviceCollection.Configure<MongodbDatabaseSettings>(configurationManager.GetSection(nameof(MongodbDatabaseSettings)));
-        serviceCollection.AddSingleton<IMongodbDatabaseSettings>(sp => sp.GetRequiredService<IOptions<MongodbDatabaseSettings>>().Value);
-        
-        serviceCollection.AddSingleton<IMongoClient>((serviceProvider) =>
-        {
-            IMongodbDatabaseSettings mongodbDatabaseSettings = serviceProvider.GetService<IMongodbDatabaseSettings>()!;
-            return new MongoClient(mongodbDatabaseSettings.ConnectionString);
-        });
+        serviceCollection.AddSingleton<IMongoClient>((serviceProvider) => new MongoClient(serviceProvider.GetConfiguration("ConnectionString")));
         serviceCollection.AddSingleton<IMongoDatabase>((serviceProvider) =>
         {
-            IMongodbDatabaseSettings mongodbDatabaseSettings = serviceProvider.GetService<IMongodbDatabaseSettings>()!;
             IMongoClient mongoClient = serviceProvider.GetService<IMongoClient>()!;
-            return mongoClient.GetDatabase(mongodbDatabaseSettings.DatabaseName);
+            return mongoClient.GetDatabase(serviceProvider.GetConfiguration("DatabaseName"));
         });
         serviceCollection.AddScoped(typeof(IRepository<Post>), typeof(PostRepository));
         serviceCollection.AddScoped(typeof(IRepository<Location>), typeof(LocationRepository));
     }
+
+    private static string? GetConfiguration(this IServiceProvider serviceProvider, string key)
+    {
+#if DEBUG
+            IConfiguration configuration = serviceProvider.GetService<IConfiguration>()!;
+            IConfigurationSection configValue = configuration.GetSection(key)!;
+            return configValue.Value;
+#endif
+#if !DEBUG
+            string? configValue = Environment.GetEnvironmentVariable(key);
+            return configValue;
+#endif
+    } 
 }
