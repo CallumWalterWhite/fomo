@@ -6,6 +6,7 @@ import PostsWidget from "scenes/widgets/PostsWidget";
 import LocationWidget from "scenes/widgets/LocationWidget";
 import MediaWidget from "scenes/widgets/MediaWidget";
 import WidgetWrapper from "components/WidgetWrapper";
+import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
 
 const ProfilePage = () => {
   const { locationId } = useParams();
@@ -13,6 +14,7 @@ const ProfilePage = () => {
   const { palette } = useTheme();
   const [selectedTab, setSelectedTab] = useState(0);
   const isNonMobileScreens = useMediaQuery("(min-width:1000px)");
+  const [mapCenter, setMapCenter] = useState({ lat: 0, lng: 0 });
   const dark = palette.neutral.dark;
   const medium = palette.neutral.medium;
   const main = palette.neutral.main;
@@ -27,6 +29,10 @@ const ProfilePage = () => {
     });
     const data = await response.json();
     setLocation(data);
+  };
+  
+  const handleMapLoad = (map) => {
+    setMapCenter({ lat: parseFloat(location.coordinates.latitude), lng: parseFloat(location.coordinates.longitude) });
   };
 
   useEffect(() => {
@@ -60,6 +66,7 @@ const ProfilePage = () => {
             <Tab label="Posts" />
             <Tab label="Media" />
             <Tab label="About" />
+            <Tab label="Location" />
             {/* Add more tabs if needed */}
           </Tabs>
           {selectedTab === 0 && (
@@ -114,6 +121,22 @@ const ProfilePage = () => {
                 </a>
               </Typography>
             </div>
+          </WidgetWrapper>
+          )}
+          {selectedTab === 3 && (
+          <WidgetWrapper className="location-widget">
+            <LoadScript googleMapsApiKey="">
+              <GoogleMap
+                mapContainerStyle={{ width: "100%", height: "400px" }}
+                center={mapCenter}
+                zoom={15}
+                onLoad={handleMapLoad}
+              >
+                {location && (
+                  <Marker position={{ lat: parseFloat(location.latitude), lng: parseFloat(location.longitude) }} />
+                )}
+              </GoogleMap>
+            </LoadScript>
           </WidgetWrapper>
           )}
         </Box>
