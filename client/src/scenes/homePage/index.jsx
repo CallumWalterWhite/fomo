@@ -34,7 +34,7 @@ const HomePage = () => {
       const data = await response.json();
       setCities(data);
     } catch (error) {
-      console.error("Error fetching cities:", error);
+      console.error("Error fetching cities!:", error);
     }
   };
 
