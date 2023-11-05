@@ -41,7 +41,7 @@ jobs:
       - name: Azure Login
         uses: azure/login@v1
         with:
-          creds: ${{ secrets.MHRNTUKNOWLEDGESHAREUKSAKS_AZURE_CREDENTIALS }}
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
 
 
       - name: Deploy to containerapp
@@ -49,5 +49,5 @@ jobs:
         with:
           inlineScript: |
             az config set extension.use_dynamic_install=yes_without_prompt
-            az containerapp registry set -n mhr-ntu-knowledge-share-uks-aks -g mhr-ntu-knowledge-share-uks-rg --server mhrntuknowledgeshareuksacr.azurecr.io --username  ${{ secrets.MHRNTUKNOWLEDGESHAREUKSAKS_REGISTRY_USERNAME }} --password ${{ secrets.MHRNTUKNOWLEDGESHAREUKSAKS_REGISTRY_PASSWORD }}
-            az containerapp update -n mhr-ntu-knowledge-share-uks-aks -g mhr-ntu-knowledge-share-uks-rg --image mhrntuknowledgeshareuksacr.azurecr.io/mhr-ntu-knowledge-share-uks-aks:${{ github.sha }}
+            az containerapp registry set -n fomo-client-uks-dev-aca -g fomo-uks-dev-rg --server fomouksdevacr.azurecr.io --username  ${{ secrets.ACR_USERNAME }} --password ${{ secrets.ACR_PASSWORD }}
+            az containerapp update -n fomo-client-uks-dev-aca -g fomo-uks-dev-rg --image fomouksdevacr.azurecr.io/fomo-client:${{ github.sha }}
