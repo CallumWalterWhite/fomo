@@ -24,7 +24,9 @@ export const getLocation = async (req, res) => {
 export const getLocationSearch = async (req, res) => {
   try {
     const { term } = req.params;
-    const locations = await Location.find({ sarchterm: { $regex: '.*' + term.toLowerCase() + '.*', $options: 'i' } }).limit(10);
+  const rgx = (pattern) => new RegExp(`.*${term}.*`);
+  const searchRgx = rgx(search);
+    const locations = await Location.find({ sarchterm: { $regex: searchRgx, $options: 'i' } }).limit(10);
     res.status(200).json(locations);
   } catch (err) {
     res.status(404).json({ message: err.message });
