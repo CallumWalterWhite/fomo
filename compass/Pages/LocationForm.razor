@@ -1,4 +1,4 @@
-﻿@page "/location/{Id}"
+﻿@page "/location/{Id}/edit"
 @using compass.Services
 @inject ILocationService _locationService;
 @inject NavigationManager NavigationManager;
@@ -13,9 +13,7 @@
             <div class="row">
                 <div class="col-md-6">
                     <MudTextField Label="Title" @bind-Value="location.Title" Required="true" Class="mb-4" />
-                    <MudTextField Label="Search Term" @bind-Value="location.SearchTerm" Class="mb-4" />
                     <MudTextField Label="Link" @bind-Value="location.Link" Required="true" Class="mb-4" />
-                    <MudTextField Label="Main Category" @bind-Value="location.MainCategory" Class="mb-4" />
                     <MudNumericField Label="Rating" @bind-Value="location.Rating" Class="mb-4" />
                     <MudNumericField Label="Reviews" @bind-Value="location.Reviews" Class="mb-4" />
                     <MudTextField Label="Website" @bind-Value="location.Website" Class="mb-4" />
@@ -23,8 +21,6 @@
                 <div class="col-md-6">
                     <MudTextField Label="Phone" @bind-Value="location.Phone" Class="mb-4" />
                     <MudTextField Label="Address" @bind-Value="location.Address" Class="mb-4" />
-                    <MudTextField Label="Place ID" @bind-Value="location.PlaceId" Class="mb-4" />
-                    <MudTextField Label="Status" @bind-Value="location.Status" Class="mb-4" />
                     <MudTextField Label="Price Range" @bind-Value="location.PriceRange" Class="mb-4" />
                     <MudTextField Label="Description" @bind-Value="location.Description" Class="mb-4" />
                 </div>

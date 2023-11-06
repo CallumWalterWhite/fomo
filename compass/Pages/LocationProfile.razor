@@ -1,0 +1,126 @@
+﻿@page "/location/{Id}"
+@using compass.Services
+@inject ILocationService _locationService;
+@inject NavigationManager NavigationManager;
+
+@if (location is not null)
+{
+   
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-md-6">
+                <MudCard>
+                    <MudCardContent>
+                        <MudText Typo="Typo.h5">@location.Title</MudText>
+                        <MudText Typo="Typo.body2">@location.Description</MudText>
+                        <MudRating SelectedValue="@rating" />
+                        <MudText Typo="Typo.body2">Review Count - @location.Reviews</MudText>
+                    </MudCardContent>
+                </MudCard>
+                <MudCard class="mt-5">
+                    <MudCardContent>
+                        <MudText Typo="Typo.h6">Hours</MudText>
+                        @foreach (OpeningHours openingHours in location.Hours)
+                        {
+                            <MudText Typo="Typo.body2">@openingHours.Day: @openingHours.Times.First()</MudText>
+                        }
+                    </MudCardContent>
+                </MudCard>
+                <MudCard class="mt-5">
+                    <MudCardContent>
+                        <MudText Typo="Typo.h6">Images</MudText>
+                        <MudCarousel Class="mud-width-full" Style="height:200px;" ShowArrows="true" ShowBullets="true" EnableSwipeGesture="true" TData="object">
+                            @foreach (var image in location.Images)
+                            {
+                                <MudCarouselItem Transition="transition">
+                                    <div class="d-flex justify-content-center align-items-center" style="height:100%">
+                                        <MudImage Src="@image.Thumbnail" Alt="@image.Title" Elevation="25" Class="rounded-lg" />
+                                    </div>
+                                </MudCarouselItem>
+                            }
+                        </MudCarousel>
+                    </MudCardContent>
+                </MudCard>
+            </div>
+            <div class="col-md-6">
+                <MudCard>
+                    <MudCardContent>
+                        <div class="custom-mud-text">
+                            <MudText Typo="Typo.body2">
+                                <MudIcon Icon="@Icons.Material.Filled.Public" Class="mr-1" /> @location.Website
+                            </MudText>
+                        </div>
+                        <div class="custom-mud-text">
+                            <MudText Typo="Typo.body2">
+                                <MudIcon Icon="@Icons.Material.Filled.Phone" Class="mr-1" /> @location.Phone
+                            </MudText>
+                        </div>
+                        <div class="custom-mud-text">
+                            <MudText Typo="Typo.body2">
+                                <MudIcon Icon="@Icons.Material.Filled.LocationCity" Class="mr-1" /> @location.Address
+                            </MudText>
+                        </div>
+                    </MudCardContent>
+                </MudCard>
+                <MudCard class="mt-5">
+                    <MudCardContent>
+                        <MudText Typo="Typo.h6">Location</MudText>
+                        <div id="google-map" style="height: 300px;"></div>
+                    </MudCardContent>
+                </MudCard>
+            </div>
+        </div>
+        <div class="text-center mt-4">
+            <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="Edit">Edit</MudButton>
+            <MudButton Color="Color.Info" Variant="Variant.Filled" OnClick="GoToPosts">Posts</MudButton>
+        </div>
+    </div>
+}
+<style>
+    .custom-mud-text {
+        overflow: clip;
+        text-overflow: ellipsis; /* Truncate the text with ellipsis if it overflows the maximum width */
+        white-space: nowrap; /* Prevent text from wrapping to the next line */
+    }
+</style>
+<script>
+    var map;
+
+    function initMap() {
+        map = new google.maps.Map(document.getElementById('google-map'), {
+            center: { lat: -34.397, lng: 150.644 }, // Set initial map center coordinates
+            zoom: 8 // Set initial zoom level
+        });
+    }
+</script>
+@code {
+    [Parameter]
+    public string Id { get; set; }
+    private Transition transition = Transition.Slide;
+    
+    public Location? location = null;
+    private int rating = 0;
+    private ImageInfo imageInfo = new ImageInfo();
+    private OpeningHours openingHours = new OpeningHours();
+    private MenuInfo menuInfo = new MenuInfo();
+    private OrderOnlineLink orderOnlineLink = new OrderOnlineLink();
+    private ReservationLink reservationLink = new ReservationLink();
+    private string category;
+    private CompleteAddress completeAddress = new CompleteAddress();
+    
+    protected override async Task OnInitializedAsync()
+    {
+        location = _locationService.GetLocation(Id);
+        rating = Convert.ToInt32(location.Rating);
+    }
+    
+    private void Edit()
+    {
+        NavigationManager.NavigateTo($"/location/{Id}/edit");
+    }
+    
+    private void GoToPosts()
+    {
+        NavigationManager.NavigateTo($"/location/{Id}/posts");
+    }
+}

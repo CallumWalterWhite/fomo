@@ -1,0 +1,106 @@
+﻿@page "/location/{Id}/posts"
+@using compass.Services
+@using compass.Models
+@inject ILocationService _locationService;
+@inject IPostService _postService;
+@inject NavigationManager NavigationManager;
+
+@if (location is not null)
+{
+    <MudContainer>
+        <MudPaper Elevation="3" Class="m-4 p-4">
+            <h3>All Posts</h3>
+            <MudTable Items="@posts" TItem="Post" Class="table-striped" Search="true">
+                <HeaderContent>
+                    <MudTh>Location Name</MudTh>
+                    <MudTh>Location City</MudTh>
+                    <MudTh>Description</MudTh>
+                    <MudTh>Actions</MudTh>
+                </HeaderContent>
+                <RowTemplate Context="post">
+                    <MudTd>@post.LocationName</MudTd>
+                    <MudTd>@post.LocationCity</MudTd>
+                    <MudTd>@post.Description</MudTd>
+                    <MudTd>
+                        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="() => EditPost(post)">Edit</MudButton>
+                        <MudButton Color="Color.Secondary" Variant="Variant.Filled" OnClick="() => DeletePost(post)">Delete</MudButton>
+                    </MudTd>
+                </RowTemplate>
+            </MudTable>
+        </MudPaper>
+        <MudFab Icon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="ShowCreatePostModal" Class="fab-position" />
+    </MudContainer>
+}
+<MudDialog @bind-IsVisible="visible" Options="dialogOptions">
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@Icons.Material.Filled.Edit" Class="mr-3" /> Create Post
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudTextField Label="Description" @bind-Value="newPost.Description" Required="true" />
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="CreatePost">Create</MudButton>
+        <MudButton Color="Color.Secondary" Variant="Variant.Outlined" OnClick="CloseCreatePostModal">Cancel</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [Parameter]
+    public string Id { get; set; }
+    
+    private bool visible;
+
+    private DialogOptions dialogOptions = new() { FullWidth = true };
+    
+    private List<Post> posts = new List<Post>();
+    public Location? location = null;
+    private bool showCreatePostModal = false;
+    private Post newPost = new Post();
+    
+    protected override void OnInitialized()
+    {
+        location = _locationService.GetLocation(Id);
+        posts = _postService.GetPosts(Id);
+    }
+    
+    private void Edit()
+    {
+        NavigationManager.NavigateTo($"/location/{Id}/edit");
+    }
+    private void ShowCreatePostModal()
+    {
+        visible = true;
+    }
+
+    private void CloseCreatePostModal()
+    {
+        visible = false;
+    }
+
+    private void CreatePost()
+    {
+        newPost.LocationDataId = location.Id;
+        newPost.LocationCity = location.CompleteAddress.City;
+        newPost.LocationCityId = location.CityId;
+        newPost.LocationName = location.Title;
+        newPost.PicturePath = location.Thumbnail;
+        newPost.LocationPath = location.Thumbnail;
+        _postService.CreatePost(newPost);
+        posts = _postService.GetPosts(Id);
+        CloseCreatePostModal();
+        newPost = new Post();
+    }
+
+    private void EditPost(Post post)
+    {
+    // Implement edit functionality if needed
+    }
+
+    private void DeletePost(Post post)
+    {
+        _postService.DeletePosts(post);
+        posts = _postService.GetPosts(Id);
+    }
+}
