@@ -42,6 +42,7 @@ const HomePage = () => {
     dispatch(setUserLocation({ location: selectedLocation }));
     setIsModalOpen(false);
     setIsModalReopened(false);
+    window.location.reload(false);
   };
 
   const handleLocationClick = () => {
