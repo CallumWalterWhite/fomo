@@ -78,9 +78,16 @@ const LocationWidget = ({ locationId, picturePath }) => {
           <LocationOnOutlined fontSize="large" sx={{ color: main }} />
           <Typography color={medium}>{complete_address.city}</Typography>
         </Box>
-        <Box display="flex" alignItems="center" gap="1rem" mb="0.5rem">
+        <Box display="block" alignItems="center" gap="1rem" mb="0.5rem">
           <Typography className="info-item">
             {location.description}
+          </Typography>
+          <Typography className="info-item">
+            {location.complete_address.street}, {location.complete_address.city}, {location.complete_address.postal_code}
+          </Typography>
+          <Box gap="1rem"></Box>
+          <Typography className="info-item">
+            {location.phone}
           </Typography>
         </Box>
       </Box>

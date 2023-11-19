@@ -111,7 +111,11 @@ const HomePage = () => {
             </Box>
           </WidgetWrapper>
           <Box m="2rem 0" />
-          {userLocation && <LocationListWidget cityId={userLocation?.CityId} cityName={userLocation?.Name} />}
+          {userLocation && <LocationListWidget cityId={userLocation?.CityId} cityName={userLocation?.Name} category="Bar" category_name="Bars" />}
+          <Box m="2rem 0" />
+          {userLocation && <LocationListWidget cityId={userLocation?.CityId} cityName={userLocation?.Name} category="Pub" category_name="Pubs" />}
+          <Box m="2rem 0" />
+          {userLocation && <LocationListWidget cityId={userLocation?.CityId} cityName={userLocation?.Name} category="Nightclub" category_name="NightClubs" />}
         </Box>
         <Box
           flexBasis={isNonMobileScreens ? "42%" : undefined}

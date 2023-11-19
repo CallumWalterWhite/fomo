@@ -81,41 +81,41 @@ const ProfilePage = () => {
           </Typography>
             <div className="location-info">
               <Typography className="info-item">
-                <strong>Description:</strong> {location.description}
+                <span>Description:</span> {location.description}
               </Typography>
               <Typography className="info-item">
-                <strong>Address:</strong> {location.complete_address.street}, {location.complete_address.city}, {location.complete_address.postal_code}
+                <span>Address:</span> {location.complete_address.street}, {location.complete_address.city}, {location.complete_address.postal_code}
               </Typography>
               <Typography className="info-item">
-                <strong>Phone:</strong> {location.phone}
+                <span>Phone:</span> {location.phone}
               </Typography>
               <Typography className="info-item">
-                <strong>Website:</strong>{" "}
+                <span>Website:</span>{" "}
                 <a href={location.website} target="_blank" rel="noopener noreferrer">
                   {location.website}
                 </a>
               </Typography>
               <Typography className="info-item">
-                <strong>Opening Hours:</strong>
+                <span>Opening Hours:</span>
                 <ul className="opening-hours">
                   {location.hours.map((day, index) => (
                     <li key={index}>
-                      <strong>{day.day}:</strong> {day.times[0]}
+                      <span>{day.day}:</span> {day.times[0]}
                     </li>
                   ))}
                 </ul>
               </Typography>
               <Typography className="info-item">
-                <strong>Categories:</strong> {location.categories.join(", ")}
+                <span>Categories:</span> {location.categories.join(", ")}
               </Typography>
               <Typography className="info-item">
-                <strong>Menu Link:</strong>{" "}
+                <span>Menu Link:</span>{" "}
                 <a href={location.menu.link} target="_blank" rel="noopener noreferrer">
                   {location.menu.link}
                 </a>
               </Typography>
               <Typography className="info-item">
-                <strong>Owner:</strong>{" "}
+                <span>Owner:</span>{" "}
                 <a href={location.owner.link} target="_blank" rel="noopener noreferrer">
                   {location.owner.name}
                 </a>

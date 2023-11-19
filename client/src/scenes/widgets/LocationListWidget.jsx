@@ -4,7 +4,7 @@ import { Link } from "react-router-dom"; // Import Link from react-router-dom
 import WidgetWrapper from "components/WidgetWrapper";
 import { useDispatch, useSelector } from "react-redux";
 
-const LocationListWidget = ({ cityId, cityName }) => {
+const LocationListWidget = ({ cityId, cityName, category, category_name }) => {
   const dispatch = useDispatch();
   const { palette } = useTheme();
   const token = useSelector((state) => state.token);
@@ -20,6 +20,7 @@ const LocationListWidget = ({ cityId, cityName }) => {
         throw new Error("Network response was not ok");
       }
       const data = await response.json();
+      console.log(data);
       dispatch(setlocations(data));
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -29,6 +30,7 @@ const LocationListWidget = ({ cityId, cityName }) => {
   useEffect(() => {
     getLocations();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  const locations_filtered = locations.filter((location) => location.main_category === category);
 
   return (
     <WidgetWrapper>
@@ -38,7 +40,7 @@ const LocationListWidget = ({ cityId, cityName }) => {
         fontWeight="500"
         sx={{ mb: "1.5rem" }}
       >
-        Bars, Pubs and Clubs in {cityName}
+        {category_name} in {cityName}
       </Typography>
       <Box
         className="scroll-container"
@@ -48,7 +50,7 @@ const LocationListWidget = ({ cityId, cityName }) => {
         flexDirection="column"
         gap="0.5rem"
       >
-        {locations.map((location) => (
+        {locations_filtered.map((location) => (
           <Link
             to={`/profile/${location._id}`}
             key={location._id}

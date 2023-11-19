@@ -35,28 +35,32 @@ const PostsWidget = ({ locationId, cityId, isProfile = false }) => {
 
   return (
     <>
-      {posts.map(
-        ({
-          _id,
-          locationdata_id,
-          locationName,
-          locationCityId,
-          locationCityName,
-          description,
-          locationPath,
-          picturePath
-        }) => (
-          <PostWidget
-            key={_id}
-            postId={_id}
-            locationdata_id={locationdata_id}
-            locationName={locationName}
-            locationCityId={locationCityId}
-            locationCity={locationCityName}
-            description={description}
-            locationPath={locationPath}
-            picturePath={picturePath}
-          />
+      {posts.length === 0 ? (
+        <p>No posts or promotions available.</p>
+      ) : (
+        posts.map(
+          ({
+            _id,
+            locationdata_id,
+            locationName,
+            locationCityId,
+            locationCityName,
+            description,
+            locationPath,
+            picturePath
+          }) => (
+            <PostWidget
+              key={_id}
+              postId={_id}
+              locationdata_id={locationdata_id}
+              locationName={locationName}
+              locationCityId={locationCityId}
+              locationCity={locationCityName}
+              description={description}
+              locationPath={locationPath}
+              picturePath={picturePath}
+            />
+          )
         )
       )}
     </>
