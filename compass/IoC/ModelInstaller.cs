@@ -19,6 +19,7 @@ public static class ModelInstaller
         });
         serviceCollection.AddScoped(typeof(IRepository<Post>), typeof(PostRepository));
         serviceCollection.AddScoped(typeof(IRepository<Location>), typeof(LocationRepository));
+        serviceCollection.AddScoped(typeof(IRepository<NightPlanner>), typeof(NightPlannerRepository));
     }
 
     private static string? GetConfiguration(this IServiceProvider serviceProvider, string key)

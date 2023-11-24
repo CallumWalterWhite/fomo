@@ -1,0 +1,140 @@
+﻿@page "/nightplanner"
+<PageTitle>Night Planner</PageTitle>
+@using compass.Services
+@using compass.Models
+@inject INightPlannerService _nightPlannerService;
+@inject NavigationManager NavigationManager;
+
+<MudContainer>
+    <MudGrid>
+        <MudItem xs="12" sm="6" md="4" lg="3">
+            <MudSelect T="City" 
+                    ToStringFunc="@converterCity"
+                    ValueChanged="OnCityValueChanged" 
+                    Label="Cities" 
+                    Variant="Variant.Filled" 
+                    AnchorOrigin="Origin.BottomCenter">
+                <MudSelectItem Value="@(new City(0, "All"))" />
+                <MudSelectItem Value="@(new City(1, "Derby"))" />
+                <MudSelectItem Value="@(new City(2, "Nottingham"))" />
+            </MudSelect>
+        </MudItem>
+        <MudItem xs="12" sm="6" md="4" lg="3">
+            <div class="text-right mt-4">
+                <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="CreateNightPlan">Create</MudButton>
+            </div>
+        </MudItem>
+    </MudGrid>
+    <MudTable T="NightPlanner" ServerData="@(new Func<TableState, Task<TableData<NightPlanner>>>(ServerReload))"
+          Dense="true" Hover="true" @ref="table"  OnRowClick="@RowClicked" >
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">Locations</MudText>
+        <MudSpacer />
+        <MudTextField T="string" ValueChanged="@(s=>OnSearch(s))" Placeholder="Search" Adornment="Adornment.Start"
+                      AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh><MudTableSortLabel SortLabel="title_field" T="NightPlanner">Title</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortLabel="city_field" T="NightPlanner">City</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortLabel="description_field" T="NightPlanner">Description</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortLabel="address_field" T="NightPlanner">Locations</MudTableSortLabel></MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Title">@context.Title</MudTd>
+        <MudTd DataLabel="City">@context.LocationCity</MudTd>
+        <MudTd DataLabel="Description">@context.Description</MudTd>
+        <MudTd DataLabel="Address">@context.LocationPlans.Count</MudTd>
+    </RowTemplate>
+    <NoRecordsContent>
+        <MudText>No matching records found</MudText>
+    </NoRecordsContent>
+    <LoadingContent>
+        <MudText>Loading...</MudText>
+    </LoadingContent>
+    <PagerContent>
+        <MudTablePager />
+    </PagerContent>
+    </MudTable>
+</MudContainer>
+@code {
+
+    private City? selectedCity {get; set;}
+    readonly Func<City, string> converterCity = p => p?.Title ?? "All";
+    
+    public class City
+    {
+        public City(int id, string title)
+        {
+            Id = id;
+            Title = title;
+        }
+        
+        public int Id { get; set; }
+        
+        public string Title { get; set; }
+
+        public override bool Equals(object o)
+        {
+            var other = o as City;
+            return other?.Title == Title;
+        }
+
+        public override int GetHashCode() => Title?.GetHashCode() ?? 0;
+
+        public override string ToString() => Title;
+    }
+    
+    private void OnCityValueChanged(City selected)
+    {
+        selectedCity = selected;
+        table.ReloadServerData();
+    }
+
+    private IEnumerable<NightPlanner> pagedData;
+    private MudTable<NightPlanner> table;
+
+    private int totalItems;
+    private string searchString = null;
+    /// <summary>
+    /// Here we simulate getting the paged, filtered and ordered data from the server
+    /// </summary>
+    private async Task<TableData<NightPlanner>> ServerReload(TableState state)
+    {
+        IList<NightPlanner> data = _nightPlannerService.GetNightPlans(selectedCity?.Id ?? 0,  searchString);
+        totalItems = data.Count;
+        switch (state.SortLabel)
+        {
+            case "title_field":
+                data = data.OrderByDirection(state.SortDirection, o => o.Title).ToList();
+                break;
+            case "city_field":
+                data = data.OrderByDirection(state.SortDirection, o => o.LocationCity).ToList();
+                break;
+            case "description_field":
+                data = data.OrderByDirection(state.SortDirection, o => o.Description).ToList();
+                break;
+            case "address_field":
+                data = data.OrderByDirection(state.SortDirection, o => o.LocationPlans.Count).ToList();
+                break;
+        }
+
+        pagedData = data.Skip(state.Page * state.PageSize).Take(state.PageSize).ToArray();
+        return new TableData<NightPlanner>() {TotalItems = totalItems, Items = pagedData};
+    }
+
+    private void OnSearch(string text)
+    {
+        searchString = text;
+        table.ReloadServerData();
+    }
+    
+    public void RowClicked(TableRowClickEventArgs<NightPlanner> p)
+    {
+        NavigationManager.NavigateTo($"/nightplanner/{p.Item.Id}");
+    }
+    
+    public void CreateNightPlan()
+    {
+        NavigationManager.NavigateTo($"/nightplanner/create");
+    }
+}

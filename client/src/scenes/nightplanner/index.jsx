@@ -1,53 +1,118 @@
-import { Box, Tab, Tabs, useMediaQuery, Typography, useTheme } from "@mui/material";
-import { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
+import {
+  LocationOnOutlined,
+} from "@mui/icons-material";
+import { Box, useMediaQuery, Typography, useTheme, Modal, Select, MenuItem, Button } from "@mui/material";
+import { useSelector, useDispatch } from "react-redux";
 import { useParams } from "react-router-dom";
 import Navbar from "scenes/navbar";
 import PostsWidget from "scenes/widgets/PostsWidget";
-import LocationWidget from "scenes/widgets/LocationWidget";
-import MediaWidget from "scenes/widgets/MediaWidget";
+import AdvertWidget from "scenes/widgets/AdvertWidget";
 import WidgetWrapper from "components/WidgetWrapper";
+import LocationListWidget from "scenes/widgets/LocationListWidget";
+import { setUserLocation } from "state";
 
 const NightPlannerPage = () => {
-  const { locationId } = useParams();
-  const [location, setLocation] = useState(null);
-  const { palette } = useTheme();
-  const [selectedTab, setSelectedTab] = useState(0);
+  const dispatch = useDispatch();
+  const userLocation = useSelector((state) => state.currentLocation) || "";
   const isNonMobileScreens = useMediaQuery("(min-width:1000px)");
+  const [selectedLocation, setSelectedLocation] = useState(userLocation.Name);
+  const [isModalOpen, setIsModalOpen] = useState(!userLocation);
+  const [isModalReopened, setIsModalReopened] = useState(false);
+  const [cities, setCities] = useState([]); 
+  const { palette } = useTheme();
   const dark = palette.neutral.dark;
   const medium = palette.neutral.medium;
   const main = palette.neutral.main;
 
-  const handleChangeTab = (event, newValue) => {
-    setSelectedTab(newValue);
+  const handleLocationChange = (event) => {
+    setSelectedLocation(event.target.value);
   };
-  const getLocation = async () => {
-    console.log(locationId);
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/location/${locationId}`, {
-      method: "GET"
-    });
-    const data = await response.json();
-    setLocation(data);
+  
+  const fetchData = async () => {
+    try {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/cities`);
+      const data = await response.json();
+      setCities(data);
+    } catch (error) {
+      console.error("Error fetching cities!:", error);
+    }
+  };
+
+  const handleConfirm = () => {
+    dispatch(setUserLocation({ location: selectedLocation }));
+    setIsModalOpen(false);
+    setIsModalReopened(false);
+    window.location.reload(false);
+  };
+
+  const handleLocationClick = () => {
+    setIsModalReopened(true);
   };
 
   useEffect(() => {
-    getLocation();
-  }, []); 
-
-  if (!location) return null;
+    setIsModalOpen(!userLocation || isModalReopened);
+    fetchData();
+  }, [userLocation, isModalReopened]);
 
   return (
     <Box>
       <Navbar />
+      
+      <Modal open={isModalOpen}>
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            bgcolor: palette.background.paper, // Set background color using palette
+            color: palette.text.primary, // Set text color using palette
+            p: 3,
+            minWidth: 300,
+            textAlign: "center",
+          }}
+        >
+          <Select
+            label="Select Location"
+            value={selectedLocation}
+            onChange={handleLocationChange}
+            sx={{ width: "100%", mb: 2, color: palette.text.primary }} // Set select styles using palette
+          >
+            {cities.map((city) => (
+              <MenuItem key={city.CityId} value={city}>
+                {city.Name}
+              </MenuItem>
+            ))}
+          </Select>
+          <Button
+            variant="contained"
+            onClick={handleConfirm}
+            sx={{ backgroundColor: palette.primary.main, color: palette.primary.contrastText }} // Set button styles using palette
+          >
+            Confirm
+          </Button>
+        </Box>
+      </Modal>
       <Box
-        width="75%"
+        width="100%"
         padding="2rem 6%"
-        display="flex"
-        flexDirection="column"
-        alignItems="center"
-        justifyContent="center"
-        margin="auto"
-        gap="2rem"
+        display={isNonMobileScreens ? "flex" : "block"}
+        gap="0.5rem"
+        justifyContent="space-between"
       >
+        <Box flexBasis={isNonMobileScreens ? "26%" : undefined}>
+          <WidgetWrapper>
+            <Box p="1rem 0">
+              <Box display="flex" alignItems="center" gap="1rem" mb="0.5rem" onClick={handleLocationClick}>
+                <LocationOnOutlined fontSize="large" sx={{ color: main }} />
+                <Typography color={palette.text.primary} style={{ cursor: "pointer" }}>
+                  {userLocation?.Name}
+                </Typography>
+              </Box>
+            </Box>
+          </WidgetWrapper>
+        </Box>
       </Box>
     </Box>
   );

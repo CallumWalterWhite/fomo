@@ -131,9 +131,11 @@ const Navbar = () => {
               <LightMode sx={{ color: dark, fontSize: "25px" }} />
             )}
           </IconButton>
-          <IconButton onClick={() => dispatch(setMode())}>
-            <Map sx={{ color: dark, fontSize: "25px" }} />
-          </IconButton>
+          <Link href="/nightplanner" rel="noopener noreferrer">
+            <IconButton>
+              <Map sx={{ color: dark, fontSize: "25px" }} />
+            </IconButton>
+          </Link>
           <Help sx={{ fontSize: "25px" }} />
         </FlexBetween>
       ) : (

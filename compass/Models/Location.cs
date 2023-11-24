@@ -74,8 +74,8 @@ public class Location : Entity
     [BsonElement("categories")]
     public List<string>? Categories { get; set; }
 
-    /*[BsonElement("coordinates")]
-    public Coordinates Coordinates { get; set; }*/
+    [BsonElement("coordinates")]
+    public Coordinates? Coordinates { get; set; }
 
     [BsonElement("plus_code")]
     public string PlusCode { get; set; }
@@ -164,10 +164,10 @@ public class OwnerInfo
 public class Coordinates
 {
     [BsonElement("latitude")]
-    public decimal Latitude { get; set; }
+    public Double? Latitude { get; set; }
 
     [BsonElement("longitude")]
-    public decimal Longitude { get; set; }
+    public Double? Longitude { get; set; }
 }
 
 public class CompleteAddress

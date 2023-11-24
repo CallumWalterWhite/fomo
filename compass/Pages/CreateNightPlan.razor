@@ -1,0 +1,186 @@
+﻿@page "/nightplanner/create"
+@page "/nightplanner/{NightPlannerId}"
+@using compass.Services
+@using compass.Models
+@inject INightPlannerService _nightPlannerService;
+@inject ILocationService _locationService;
+@inject NavigationManager NavigationManager;
+
+<MudPage>
+    <MudCardContent>
+        <EditForm Model="nightPlanner" OnValidSubmit="HandleValidSubmit">
+            <DataAnnotationsValidator />
+            <MudGrid>
+                <MudItem xs="12" md="6">
+                    <MudTextField @bind-Value="nightPlanner.Title" Label="Title" />
+                </MudItem>
+                <MudItem xs="12" md="6">
+                    <MudTextField @bind-Value="nightPlanner.Description" Label="Description" />
+                </MudItem>
+                <MudItem xs="12" md="6">
+                    <MudSelect T="City"
+                               ValueChanged="OnCityValueChanged"
+                               Label="Cities"
+                               Variant="Variant.Filled"
+                               AnchorOrigin="Origin.BottomCenter">
+                        <MudSelectItem Value="@(new City(1, "Derby"))"/>
+                        <MudSelectItem Value="@(new City(2, "Nottingham"))"/>
+                    </MudSelect>
+                </MudItem>
+                @if (CitySet)
+                {
+                    <MudItem xs="12">
+                        <MudTable Items="_locationPlansCreates" Class="mt-3">
+                            <HeaderContent>
+                                <MudTh>Location</MudTh>
+                                <MudTh>Duration</MudTh>
+                                <MudTh>Order</MudTh>
+                                <MudTh></MudTh>
+                            </HeaderContent>
+                            <RowTemplate Context="locationPlanContext">
+                                <MudTd>
+                                    <MudSelect T="Location"
+                                               ValueChanged="@((x) => OnLocationValueChanged(x, locationPlanContext))"
+                                               Label="Locations"
+                                               Variant="Variant.Filled"
+                                               AnchorOrigin="Origin.BottomCenter">
+                                        @foreach (var location in _locations)
+                                        {
+                                            <MudSelectItem Value="@location">@location.Title</MudSelectItem>
+                                        }
+                                    </MudSelect>
+                                </MudTd>
+                                <MudTd><MudTextField @bind-Value="locationPlanContext.Duration" /></MudTd>
+                                <MudTd><MudTextField @bind-Value="locationPlanContext.Order" /></MudTd>
+                                <MudTd>
+                                    <MudButton OnClick="@(() => RemoveLocationPlan(locationPlanContext))">Remove</MudButton>
+                                </MudTd>
+                            </RowTemplate>
+                        </MudTable>
+                        <MudButton OnClick="AddLocationPlan" Class="mt-2">Add Location Plan</MudButton>
+                    </MudItem>   
+                }
+            </MudGrid>
+            <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="HandleValidSubmit">Submit</MudButton>
+        </EditForm>
+    </MudCardContent>
+</MudPage>
+
+@code {
+    [Parameter]
+    public string NightPlannerId { get; set; }
+    private NightPlanner nightPlanner = new NightPlanner();
+
+    private bool CitySet = false;
+    
+    class LocationPlansCreate
+    {
+        public Location location { get; set; }
+        
+        public int Duration { get; set; }
+        
+        public int Order { get; set; }
+    }
+    
+    private IList<Location> _locations = new List<Location>();
+    private IList<LocationPlansCreate> _locationPlansCreates = new List<LocationPlansCreate>();
+
+    protected override void OnInitialized()
+    {
+        if (!string.IsNullOrEmpty(NightPlannerId))
+        {
+            nightPlanner = _nightPlannerService.GetNightPlanner(NightPlannerId);
+            _locations = _locationService.GetLocations(nightPlanner.LocationCityId, 0)
+                .Where(x => x.Coordinates is { Latitude: { }, Longitude: { } }).ToList();
+
+            foreach (var locationPlan in nightPlanner.LocationPlans)
+            {
+                _locationPlansCreates.Add(new LocationPlansCreate
+                {
+                    location = _locations.FirstOrDefault(x => x.Id == locationPlan.locationdata_id),
+                    Duration = locationPlan.Duration,
+                    Order = locationPlan.Order
+                });
+            }
+
+            CitySet = true;
+        }
+    }
+    
+    private void AddLocationPlan()
+    {
+        nightPlanner.LocationPlans ??= new List<LocationPlan>();
+        _locationPlansCreates.Add(new LocationPlansCreate());
+    }
+
+    private void RemoveLocationPlan(LocationPlansCreate locationPlan)
+    {
+        _locationPlansCreates.Remove(locationPlan);
+    }
+
+    private void HandleValidSubmit()
+    {
+        nightPlanner.LocationPlans = _locationPlansCreates.Select(x => new LocationPlan()
+        {
+            Duration = x.Duration,
+            Order = x.Order,
+            locationdata_id = x.location.Id,
+            Longitude = float.Parse(x.location.Coordinates.Longitude.ToString()),
+            Latitude = float.Parse(x.location.Coordinates.Latitude.ToString()),
+        }).ToList();
+        if (string.IsNullOrEmpty(NightPlannerId))
+        {
+            _nightPlannerService.AddNightPlanner(nightPlanner);
+        }
+        else
+        {
+            _nightPlannerService.UpdateNightPlanner(nightPlanner);
+        }
+        NavigationManager.NavigateTo($"/nightplanner");
+    }
+    
+    private class LocationPlanContext
+    {
+        public LocationPlansCreate locationPlan { get; set; }
+        public int index { get; set; }
+    }
+    
+    private void OnCityValueChanged(City selected)
+    {
+        nightPlanner.LocationCity = selected.Title;
+        nightPlanner.LocationCityId = selected.Id;
+        _locations = _locationService.GetLocations(selected.Id, 0)
+            .Where(x => x.Coordinates is { Latitude: { },Longitude: { } }).ToList();
+        CitySet = true;
+        _locationPlansCreates = new List<LocationPlansCreate>();
+    }
+    
+    
+    private void OnLocationValueChanged(Location selected, LocationPlansCreate locationPlansCreate)
+    {
+        locationPlansCreate.location = selected;
+    }
+
+    public class City
+    {
+        public City(int id, string title)
+        {
+            Id = id;
+            Title = title;
+        }
+        
+        public int Id { get; set; }
+        
+        public string Title { get; set; }
+
+        public override bool Equals(object o)
+        {
+            var other = o as City;
+            return other?.Title == Title;
+        }
+
+        public override int GetHashCode() => Title?.GetHashCode() ?? 0;
+
+        public override string ToString() => Title;
+    }
+}

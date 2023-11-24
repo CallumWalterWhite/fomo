@@ -9,5 +9,6 @@ public static class ServiceInstaller
     {
         serviceCollection.AddScoped<IPostService, PostService>();
         serviceCollection.AddScoped<ILocationService, LocationService>();
+        serviceCollection.AddScoped<INightPlannerService, NightPlannerService>();
     }
 }
